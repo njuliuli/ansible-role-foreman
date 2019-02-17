@@ -10,8 +10,6 @@
     mode: 0755
 
 - name: Resolve hostname via /etc/hosts to resolve `hostname -f`
-  #lineinfile: dest=/etc/hosts line="{{ansible_default_ipv4.address}} {{ansible_fqdn}} {{ansible_hostname}}"
-  #command: python /tmp/modify_hosts.py "{{ansible_default_ipv4.address}}", "{{ansible_default_ipv4.address}} {{ansible_hostname}}"
   command: /usr/local/bin/mungehosts -a "{{ansible_default_ipv4.address}} {{foreman_hostname}}"
   when: foreman_hostname is defined
 
@@ -64,6 +62,10 @@
         --foreman-admin-password={{ foreman_admin_password }}
         --puppet-server=false --foreman-proxy-puppet=false --foreman-proxy-puppetca=false
         {{foreman_cmd_options | join (' ')}}
+      register: taskResult
+      until: taskResult is succeeded
+      retries: 3
+      delay: 15
   when: disable_puppet | bool
 
 - name: Install and Configure Foreman with Puppet
@@ -81,6 +83,12 @@
         --foreman-admin-username={{ foreman_admin_username }}
         --foreman-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
+      register: taskResult
+      until: taskResult is succeeded
+      retries: 3
+      delay: 15
   when: disable_puppet == false
 
-
+- name: Print installation result
+  debug:
+    msg: "{{ taskResult.stdout }}"
