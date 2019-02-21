@@ -9,8 +9,6 @@
     dest: /usr/local/bin/mungehosts
     mode: 0755
 
-# not working correctly when there exists an older foreman_hostname entry
-# so I use a separate ansible-fqdn role for this purpose
 - name: Resolve hostname via /etc/hosts to resolve `hostname -f`
   command: /usr/local/bin/mungehosts -a "{{ansible_default_ipv4.address}} {{foreman_hostname}}"
   when: foreman_hostname is defined
