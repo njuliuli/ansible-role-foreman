@@ -49,6 +49,8 @@
         foreman-installer
         --foreman-unattended=true
         --enable-foreman --enable-foreman-cli --enable-foreman-proxy
+        --foreman-admin-username={{ foreman_admin_username }}
+        --foreman-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
       register: taskResult
       until: taskResult is succeeded
@@ -76,8 +78,8 @@
         # --foreman-db-database={{ foreman_db_database }}
         # --foreman-db-username={{ foreman_db_username }}
         # --foreman-db-password={{ foreman_db_password }}
-        # --foreman-admin-username={{ foreman_admin_username }}
-        # --foreman-admin-password={{ foreman_admin_password }}
+        --foreman-admin-username={{ foreman_admin_username }}
+        --foreman-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
       register: taskResult
       until: taskResult is succeeded
