@@ -42,45 +42,52 @@
 - name: Download foreman installer package
   apt: name=foreman-installer force=yes update_cache=yes
 
-- name: Install and Configure foreman with puppet
+- name: Install and Configure foreman
   block:
     - name: Install foreman with puppet
       command: >
         foreman-installer
         --foreman-unattended=true
         --enable-foreman --enable-foreman-cli --enable-foreman-proxy
-        --foreman-admin-username={{ foreman_admin_username }}
-        --foreman-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
       register: taskResult
       until: taskResult is succeeded
       retries: 3
       delay: 15
-    - name: Print installation result
-      debug:
-        msg: "{{ taskResult.stdout }}"
-  when: disable_puppet == false
+      when: disable_puppet == false
 
-- name: Install and Configure foreman without puppet
-  block:
     - name: Install puppet agent
       apt: name=puppet-agent force=yes update_cache=yes
+      when: disable_puppet | bool
     - name: Install foreman without puppet
       command: >
         foreman-installer
         --foreman-unattended=true
         --puppet-server=false --foreman-proxy-puppet=false --foreman-proxy-puppetca=false
-        # # not working right now, default value is:
-        # # --foreman-db-manage=true --foreman-db-type=mysql --foreman-db-database=foremandb --foreman-db-username=foreman --foreman-db-password=dbpassword --foreman-admin-username=admin --foreman-admin-password=password
-        # --foreman-db-manage={{ foreman_db_manage | bool | lower }}
-        # --foreman-db-type={{ foreman_db_type }}
-        # --foreman-db-host={{ foreman_db_host }}
-        # --foreman-db-database={{ foreman_db_database }}
-        # --foreman-db-username={{ foreman_db_username }}
-        # --foreman-db-password={{ foreman_db_password }}
-        --foreman-admin-username={{ foreman_admin_username }}
-        --foreman-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
+      register: taskResult
+      until: taskResult is succeeded
+      retries: 3
+      delay: 15
+      when: disable_puppet | bool
+
+      # # not working right now, other parameters:
+      # # --foreman-db-manage=true --foreman-db-type=mysql --foreman-db-database=foremandb --foreman-db-username=foreman --foreman-db-password=dbpassword --foreman-admin-username=admin --foreman-admin-password=password
+      # --foreman-db-manage={{ foreman_db_manage | bool | lower }}
+      # --foreman-db-type={{ foreman_db_type }}
+      # --foreman-db-host={{ foreman_db_host }}
+      # --foreman-db-database={{ foreman_db_database }}
+      # --foreman-db-username={{ foreman_db_username }}
+      # --foreman-db-password={{ foreman_db_password }}
+      # --foreman-admin-username={{ foreman_admin_username }}
+      # --foreman-admin-password={{ foreman_admin_password }}
+
+- name: customize and display username/password
+  block:
+    # setting new user/pass in packer failed, not knowing why
+    - name: make sure the username/password is changed in packer build
+      command: >
+        foreman-installer
       register: taskResult
       until: taskResult is succeeded
       retries: 3
@@ -88,4 +95,3 @@
     - name: Print installation result
       debug:
         msg: "{{ taskResult.stdout }}"
-  when: disable_puppet | bool
