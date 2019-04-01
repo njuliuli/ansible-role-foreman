@@ -64,6 +64,8 @@
         foreman-installer
         --foreman-unattended=true
         --puppet-server=false --foreman-proxy-puppet=false --foreman-proxy-puppetca=false
+        --foreman-initial-admin-username={{ foreman_admin_username }}
+        --foreman-initial-admin-password={{ foreman_admin_password }}
         {{foreman_cmd_options | join (' ')}}
       register: taskResult
       until: taskResult is succeeded
