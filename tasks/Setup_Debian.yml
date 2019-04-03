@@ -84,16 +84,17 @@
       # --foreman-admin-username={{ foreman_admin_username }}
       # --foreman-admin-password={{ foreman_admin_password }}
 
-- name: customize and display username/password
-  block:
-    # setting new user/pass in packer failed, not knowing why
-    - name: make sure the username/password is changed in packer build
-      command: >
-        foreman-installer
-      register: taskResult
-      until: taskResult is succeeded
-      retries: 3
-      delay: 15
-    - name: Print installation result
-      debug:
-        msg: "{{ taskResult.stdout }}"
+
+# - name: customize and display username/password
+#   block:
+#     # setting new user/pass in packer failed, not knowing why
+#     - name: make sure the username/password is changed in packer build
+#       command: >
+#         foreman-installer
+#       register: taskResult
+#       until: taskResult is succeeded
+#       retries: 3
+#       delay: 15
+#     - name: Print installation result
+#       debug:
+#         msg: "{{ taskResult.stdout }}"
