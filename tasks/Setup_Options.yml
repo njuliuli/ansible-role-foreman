@@ -57,3 +57,8 @@
     foreman_cmd_options: "{{ foreman_cmd_options }}  +  [ '--puppet-server-{{ item.key }}={{ item.value }}' ]"
   with_dict: "{{ puppet_server_options | default({}) }}"
   when: puppet_server_options defined
+
+- name: Set foreman IP
+  set_fact:
+    foreman_ip: "{{ ansible_default_ipv4.address }}"
+  when: foreman_ip is not defined

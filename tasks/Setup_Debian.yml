@@ -10,7 +10,9 @@
     mode: 0755
 
 - name: Resolve hostname via /etc/hosts to resolve `hostname -f`
-  command: /usr/local/bin/mungehosts -a "{{ansible_default_ipv4.address}} {{foreman_hostname}}"
+  # note this utility will not remove previous added entries,
+  # which may be a problem in the future
+  command: /usr/local/bin/mungehosts -a "{{ foreman_ip }} {{foreman_hostname}}"
   when: foreman_hostname is defined
 
 - name: Update CA Certificate
